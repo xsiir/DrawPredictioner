@@ -3,6 +3,8 @@ package pl.sienkiewicz.services;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -64,11 +66,24 @@ public class APIServiceImpl implements APIService {
 
 	@Override
 	public void printList(String type) {
+		
+		Comparator<Team> comparator = new Comparator<Team>() {
+
+			@Override
+			public int compare(Team o1, Team o2) {
+				Double drawsTeam1= o1.getFixtures().getStatsByMatchType(type).getDrawAVG();
+				Double drawsTeam2 = o2.getFixtures().getStatsByMatchType(type).getDrawAVG();
+				return (int)(drawsTeam2-drawsTeam1);
+			}
+		};
+		
+		Collections.sort(repository.getTeamList(), comparator);
 		for(Team team : repository.getTeamList()) {
-			System.out.println(team.getName() + " TYPE: " +  team.getFixtures().getStatsByMatchType(type).getDraw() + " ");
+			System.out.println(type + ": " + team.getName() + " PlayedGames: " + team.getFixtures().getStatsByMatchType(type).getPlayedGames() + " DRAWS: " + team.getFixtures().getStatsByMatchType(type).getDraw() + " AVG: " + team.getFixtures().getStatsByMatchType(type).getDrawAVG());
 		}
 		
 	}
+	
 
 
 

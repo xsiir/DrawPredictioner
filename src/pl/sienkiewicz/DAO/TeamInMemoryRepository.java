@@ -31,7 +31,6 @@ public class TeamInMemoryRepository {
 		}
 	}
 	
-
 	private boolean isAlreadyInList(TeamDTO team) {
 		for (Team tempTeam : teamList) {
 			if (tempTeam.getName().equalsIgnoreCase(team.getName()))

@@ -10,7 +10,7 @@ public class GameStats {
 		this.playedGames = playedGames;
 		this.draw = draw;
 		if(draw==0 || playedGames == 0) {this.drawAVG = 0;}
-		else this.drawAVG = (double)(this.draw/this.playedGames*100);
+		else this.drawAVG = Math.round(((double)this.draw/(double)this.playedGames*100));
 	}
 	
 	public int getPlayedGames() {
