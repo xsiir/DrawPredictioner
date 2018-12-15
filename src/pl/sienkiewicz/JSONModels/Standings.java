@@ -17,7 +17,7 @@ public class Standings {
 	public String getStage() {
 		return stage;
 	}
-	public String getType() {
+	public String getMatchType() {
 		return type;
 	}
 	public String getGroup() {

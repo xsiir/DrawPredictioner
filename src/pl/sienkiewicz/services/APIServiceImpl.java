@@ -20,7 +20,6 @@ import pl.sienkiewicz.JSONModels.JSONResult;
 import pl.sienkiewicz.JSONModels.Standings;
 import pl.sienkiewicz.JSONModels.Table;
 import pl.sienkiewicz.api.APIService;
-import pl.sienkiewicz.models.GameStats;
 import pl.sienkiewicz.models.Team;
 
 @Service
@@ -38,17 +37,8 @@ public class APIServiceImpl implements APIService {
 		return response.getBody();
 	}
 
-//	@Override
-//	public void getLeagueFixturesDetails(List<String> leauges) throws JsonSyntaxException, UnirestException {
-//		for(String leaugeCode : leauges) {
-//		JSONResult result = new Gson().fromJson(callAPI(leaugeCode), JSONResult.class);
-//		addResultFromJSONToList(result);
-//		}
-//	}
-
 	@Override
-	public void getLeagueFixturesDetails()
-			throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
+	public void getLeagueFixturesDetails() throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
 		Properties p = new Properties();
 		p.load(new FileInputStream("..\\Projekty\\DrawPredictioner\\src\\resources\\leagues.properties"));
 		Enumeration e = p.propertyNames();
@@ -60,19 +50,27 @@ public class APIServiceImpl implements APIService {
 
 	private void addResultFromJSONToList(JSONResult result) {
 		for (Standings standing : result.getStandings()) {
-			for (Table position : standing.getTable()) {
-				TeamDTO team = new TeamDTO(standing.getType(), position.getTeam().getName(), position.getTeam().getId(),
-						position.getPlayedGames(), position.getDraw());
-				repository.addTeamToDataBase(team);
+			for (Table row : standing.getTable()) {
+				TeamDTO team = new TeamDTO(
+						standing.getMatchType(), 
+						row.getTeam().getName(), 
+						row.getTeam().getId(),
+						row.getPlayedGames(), 
+						row.getDraw());
+				repository.addTeamFixtureToDataBase(team);
 			}
 		}
 	}
 
-	public void printList() {
-		for (Team team : repository.getTeamList()) {
-			GameStats stats = team.getFixtures().getStatsByMatchType("TOTAL");
-			System.out.println(team.getName() + " " + " GAMES: " + stats.getPlayedGames() + " DRAWS: " + stats.getDraw());
+	@Override
+	public void printList(String type) {
+		for(Team team : repository.getTeamList()) {
+			System.out.println(team.getName() + " TYPE: " +  team.getFixtures().getStatsByMatchType(type).getDraw() + " ");
 		}
+		
 	}
+
+
+
 
 }

@@ -18,22 +18,19 @@ public class TeamInMemoryRepository {
 		return teamList;
 	}
 
-	public void addTeamToDataBase(TeamDTO team) {
+	public void addTeamFixtureToDataBase(TeamDTO team) {
 		if (!isAlreadyInList(team)) {
 			Team newTeam = new Team(team.getName());
-			GameStats stats = new GameStats(team.getPlayedGames(), team.getDraw());
-			newTeam.getFixtures().putStats(team.getType(), stats);
 			teamList.add(newTeam);
-		} else {
-			for (Team tempTeam : teamList) {
-				if (tempTeam.getName().equalsIgnoreCase(team.getName())) {
-					GameStats stats = new GameStats(team.getPlayedGames(), team.getDraw());
-					tempTeam.getFixtures().putStats(team.getType(), stats);
-				}
-
+		}
+		for (Team tempTeam : teamList) {
+			if (tempTeam.getName().equalsIgnoreCase(team.getName())) {
+				GameStats stats = new GameStats(team.getPlayedGames(), team.getDraw());
+				tempTeam.addNewFixture(team.getType(), stats);
 			}
 		}
 	}
+	
 
 	private boolean isAlreadyInList(TeamDTO team) {
 		for (Team tempTeam : teamList) {

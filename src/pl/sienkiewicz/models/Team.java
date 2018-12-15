@@ -23,6 +23,10 @@ public class Team {
 		this.fixtures = fixtures;
 	}
 	
+	public void addNewFixture(String type, GameStats stats) {
+		this.fixtures.putStats(type, stats);
+	}
+	
 	
 
 }
