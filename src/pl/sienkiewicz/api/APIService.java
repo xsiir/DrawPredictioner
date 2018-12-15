@@ -29,7 +29,7 @@ public interface APIService {
 	
 	/**
 	 * 
-	 * @param type rodzaj rozegranych meczy sluzacy do filtrowania wynikow - tu: TOTAL, AWAY, HOME
+	 * @param type rodzaj rozegranych meczy, sluzacy do filtrowania wynikow - tu: TOTAL, AWAY, HOME
 	 */
 	void printList(String matchType);
 
