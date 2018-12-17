@@ -3,7 +3,7 @@ package pl.sienkiewicz.models;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Fixtures {
+public class TeamFixtures {
 	
 	private Map<String, GameStats> fixtures = new LinkedHashMap<>();
 	

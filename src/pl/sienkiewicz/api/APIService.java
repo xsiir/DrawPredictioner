@@ -33,5 +33,11 @@ public interface APIService {
 	 */
 	void printList(String matchType);
 
+	String callAPIForMatches() throws UnirestException;
+
+	void addMatchToRepository() throws JsonSyntaxException, UnirestException;
+	
+	void printMatchesList();
+
 	
 }

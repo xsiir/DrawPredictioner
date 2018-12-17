@@ -16,9 +16,12 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import pl.sienkiewicz.DAO.MatchesInMemoryRepository;
 import pl.sienkiewicz.DAO.TeamInMemoryRepository;
 import pl.sienkiewicz.DTO.TeamDTO;
+import pl.sienkiewicz.JSONModels.JSONMatchesResult;
 import pl.sienkiewicz.JSONModels.JSONResult;
+import pl.sienkiewicz.JSONModels.Matches;
 import pl.sienkiewicz.JSONModels.Standings;
 import pl.sienkiewicz.JSONModels.Table;
 import pl.sienkiewicz.api.APIService;
@@ -28,7 +31,8 @@ import pl.sienkiewicz.models.Team;
 public class APIServiceImpl implements APIService {
 
 	private static final String _KEY = "09655cb8d0e34f6fb81f2800e5eb12d5";
-	private TeamInMemoryRepository repository = new TeamInMemoryRepository();
+	private TeamInMemoryRepository TeamRepository = new TeamInMemoryRepository();
+	private MatchesInMemoryRepository matchesRepository = new MatchesInMemoryRepository();
 
 	@Override
 	public String callAPI(String code) throws UnirestException {
@@ -40,7 +44,8 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public void getLeagueFixturesDetails() throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
+	public void getLeagueFixturesDetails()
+			throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
 		Properties p = new Properties();
 		p.load(new FileInputStream("..\\Projekty\\DrawPredictioner\\src\\resources\\leagues.properties"));
 		Enumeration e = p.propertyNames();
@@ -53,39 +58,54 @@ public class APIServiceImpl implements APIService {
 	private void addResultFromJSONToList(JSONResult result) {
 		for (Standings standing : result.getStandings()) {
 			for (Table row : standing.getTable()) {
-				TeamDTO team = new TeamDTO(
-						standing.getMatchType(), 
-						row.getTeam().getName(), 
-						row.getTeam().getId(),
-						row.getPlayedGames(), 
-						row.getDraw());
-				repository.addTeamFixtureToDataBase(team);
+				TeamDTO team = new TeamDTO(standing.getMatchType(), row.getTeam().getName(), row.getTeam().getId(),
+						row.getPlayedGames(), row.getDraw());
+				TeamRepository.addTeamFixtureToDataBase(team);
 			}
 		}
 	}
 
 	@Override
-	public void printList(String type) {
-		
-		Comparator<Team> comparator = new Comparator<Team>() {
+	public void printList(String matchType) {
 
-			@Override
-			public int compare(Team o1, Team o2) {
-				Double drawsTeam1= o1.getFixtures().getStatsByMatchType(type).getDrawAVG();
-				Double drawsTeam2 = o2.getFixtures().getStatsByMatchType(type).getDrawAVG();
-				return (int)(drawsTeam2-drawsTeam1);
-			}
-		};
-		
-		Collections.sort(repository.getTeamList(), comparator);
-		for(Team team : repository.getTeamList()) {
-			System.out.println(type + ": " + team.getName() + " PlayedGames: " + team.getFixtures().getStatsByMatchType(type).getPlayedGames() + " DRAWS: " + team.getFixtures().getStatsByMatchType(type).getDraw() + " AVG: " + team.getFixtures().getStatsByMatchType(type).getDrawAVG());
+		Collections.sort(TeamRepository.getdrawStatsList(), getDrawComparator(matchType));
+		for (Team team : TeamRepository.getdrawStatsList()) {
+			System.out.println(matchType + ": " 
+					+ team.getName() + " PlayedGames: "
+					+ team.getPlayedGamesByMatchType(matchType) + " DRAWS: "
+					+ team.getDrawsByMatchType(matchType) + " AVG: "
+					+ team.getDrawsAVGByMatchType(matchType));
 		}
-		
 	}
 	
-
-
-
-
+	private Comparator<Team> getDrawComparator(String matchType){
+		Comparator<Team> comparator = new Comparator<Team>() {
+			@Override
+			public int compare(Team o1, Team o2) {
+				return (int) (o2.getDrawsAVGByMatchType(matchType) - o1.getDrawsAVGByMatchType(matchType));
+			}
+		};
+		return comparator;
+	} 
+	
+	public String callAPIForMatches() throws UnirestException {
+		HttpResponse<String> responseBody = Unirest.get("http://api.football-data.org/v2/competitions/PL/matches?status=SCHEDULED")
+			.header("X-Auth-Token", _KEY).asString();
+		
+		return responseBody.getBody();
+	}
+	
+	public void addMatchToRepository() throws JsonSyntaxException, UnirestException {
+		JSONMatchesResult result = new Gson().fromJson(callAPIForMatches(), JSONMatchesResult.class);
+		for(Matches match : result.getMatches()) {
+			matchesRepository.addNewMatchToDataBase(match);
+		}
+	}
+	
+	public void printMatchesList() {
+		for(Matches match : matchesRepository.getMatchesList()) {
+			System.out.println(match.getHomeTeam().getName() + " VS " + match.getAwayTeam().getName());
+		}
+	}
+	
 }

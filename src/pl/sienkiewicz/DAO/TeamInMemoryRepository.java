@@ -12,31 +12,30 @@ import pl.sienkiewicz.models.Team;
 @Component
 public class TeamInMemoryRepository {
 
-	private List<Team> teamList = new ArrayList<Team>();
+	private List<Team> drawStatsList = new ArrayList<Team>();
 
-	public List<Team> getTeamList() {
-		return teamList;
+	public List<Team> getdrawStatsList() {
+		return drawStatsList;
 	}
 
 	public void addTeamFixtureToDataBase(TeamDTO team) {
 		if (!isAlreadyInList(team)) {
 			Team newTeam = new Team(team.getName());
-			teamList.add(newTeam);
+			drawStatsList.add(newTeam);
 		}
-		for (Team tempTeam : teamList) {
+		for (Team tempTeam : drawStatsList) {
 			if (tempTeam.getName().equalsIgnoreCase(team.getName())) {
 				GameStats stats = new GameStats(team.getPlayedGames(), team.getDraw());
 				tempTeam.addNewFixture(team.getType(), stats);
 			}
 		}
 	}
-	
+
 	private boolean isAlreadyInList(TeamDTO team) {
-		for (Team tempTeam : teamList) {
+		for (Team tempTeam : drawStatsList) {
 			if (tempTeam.getName().equalsIgnoreCase(team.getName()))
 				return true;
 		}
 		return false;
 	}
-
 }
