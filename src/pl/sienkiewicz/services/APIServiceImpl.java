@@ -3,13 +3,7 @@ package pl.sienkiewicz.services;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Properties;
 
 import org.springframework.stereotype.Service;
@@ -29,7 +23,6 @@ import pl.sienkiewicz.JSONModels.Matches;
 import pl.sienkiewicz.JSONModels.Standings;
 import pl.sienkiewicz.JSONModels.Table;
 import pl.sienkiewicz.api.APIService;
-import pl.sienkiewicz.models.Team;
 
 @Service
 public class APIServiceImpl implements APIService {
@@ -59,6 +52,7 @@ public class APIServiceImpl implements APIService {
 	@Override
 	public void addMatchesToRepository(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
 		matchesRepository.getMatchesList().clear();
+		if(teamRepository.getDrawStatsList().isEmpty()) {addStandingsToBase();}
 		Enumeration leagueProperties = getLeagueEnumeration();
 		for (; leagueProperties.hasMoreElements();) {
 			JSONMatchesResult result = new Gson().fromJson(callAPIForNextMatches(leagueProperties.nextElement().toString(), dateFrom, dateFor), JSONMatchesResult.class);

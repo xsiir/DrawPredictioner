@@ -3,7 +3,6 @@ package pl.sienkiewicz.DAO;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import pl.sienkiewicz.DTO.TeamDTO;
