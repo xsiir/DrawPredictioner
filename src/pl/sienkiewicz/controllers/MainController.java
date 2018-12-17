@@ -3,6 +3,7 @@ package pl.sienkiewicz.controllers;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,46 +13,34 @@ import com.google.gson.JsonSyntaxException;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import pl.sienkiewicz.api.APIService;
+import pl.sienkiewicz.api.PrinterService;
 
 
 @Controller
 @RequestMapping("/")
 public class MainController {
 	
-	private final APIService apiService;
+	private final PrinterService printerService;
 	
 	@Autowired
-	public MainController(APIService apiService) {
-		this.apiService = apiService;
+	public MainController(PrinterService printerService) {
+		this.printerService = printerService;
 	}
 
 	
 	@ResponseBody
-	@RequestMapping("/test")
-	public String check() throws UnirestException, IOException {
-		apiService.getLeagueFixturesDetails();
-		return "Done!";
-	}
-
-	@RequestMapping("/getList")
-	@ResponseBody
-	public String getList(@RequestParam(name = "type", required = false) String matchType) {
-		apiService.printList(matchType);
-		return "Check console!";
+	@RequestMapping("/getTeamList")
+	public String getTeamList(@RequestParam(name = "type", required = false) String matchType) throws UnirestException, IOException {
+		printerService.printTeamDetails(matchType);
+		return "Check console for team list!!";
 	}
 	
-	@RequestMapping("/test2")
 	@ResponseBody
-	public String check2() throws JsonSyntaxException, UnirestException {
-		apiService.addMatchToRepository();
-		return "Done!";
-	}
-	
-	@RequestMapping("/matches")
-	@ResponseBody
-	public String getMatchesList() {
-		apiService.printMatchesList();
-		return "Check console!";
+	@RequestMapping("/getMatches")
+	public String getMatches(@RequestParam(name = "dateFrom", required = false) String dateFrom,
+			@RequestParam(name = "dateFor", required = false) String dateFor) throws JsonSyntaxException, UnirestException {
+		printerService.printFixtures(dateFrom, dateFor);
+		return "Check console for the nearest matches!"; 
 	}
 	
 

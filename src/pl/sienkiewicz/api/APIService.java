@@ -12,10 +12,10 @@ public interface APIService {
 	/**
 	 * 
 	 * @param leaugeCode kod ligi ktorej dane chcemy pobrac
-	 * @return odpowiedz zapisana w formacie JSON jako String
+	 * @return odpowiedz zapisana w formacie JSON zwrocna jako String
 	 * @throws UnirestException jesli nie uda sie poborac danych z API
 	 */
-	String callAPI(String leaugeCode) throws UnirestException;
+	String callAPIForStandings(String leaugeCode) throws UnirestException;
 	
 	/**
 	 * 
@@ -25,19 +25,17 @@ public interface APIService {
 	 * @throws FileNotFoundException jesli nie znajdzie pliku .properties
 	 * @throws IOException jesli napotka blad z polaczeniem
 	 */
-	void getLeagueFixturesDetails() throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException;
+	void addStandingsToBase() throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException;
 	
 	/**
 	 * 
-	 * @param type rodzaj rozegranych meczy, sluzacy do filtrowania wynikow - tu: TOTAL, AWAY, HOME
+	 * @param dateFrom poczatkowa data pobranych rozgrywek
+	 * @param dateFor date koncowa data pobranych rozgrywek
+	 * @return odpowiedz zapisana w formacie JSON zwrocona jako String
+	 * @throws UnirestException jesli nie uda sie pobrac danych z API
 	 */
-	void printList(String matchType);
+	String callAPIForNextMatches(String dateFrom, String dateFor) throws UnirestException;
 
-	String callAPIForMatches() throws UnirestException;
-
-	void addMatchToRepository() throws JsonSyntaxException, UnirestException;
-	
-	void printMatchesList();
-
+	void addMatchesToRepository(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException;
 	
 }

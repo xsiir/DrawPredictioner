@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 
-public class JSONResult {
+public class JSONStandingsResult {
 
 	@SerializedName("filters")
 	private Filters filters;

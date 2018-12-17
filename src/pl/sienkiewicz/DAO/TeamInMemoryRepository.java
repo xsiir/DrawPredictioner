@@ -4,17 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import pl.sienkiewicz.DTO.TeamDTO;
 import pl.sienkiewicz.models.GameStats;
 import pl.sienkiewicz.models.Team;
 
-@Component
+@Repository
 public class TeamInMemoryRepository {
 
-	private List<Team> drawStatsList = new ArrayList<Team>();
+	private static List<Team> drawStatsList = new ArrayList<Team>();
 
-	public List<Team> getdrawStatsList() {
+	public List<Team> getDrawStatsList() {
 		return drawStatsList;
 	}
 
