@@ -1,5 +1,6 @@
 package pl.sienkiewicz.controllers;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +31,21 @@ public class MainController {
 	
 	@ResponseBody
 	@RequestMapping("/getTeamList")
-	public String getTeamList(@RequestParam(name = "type", required = false) String matchType) throws UnirestException, IOException {
+	public String getTeamList(@RequestParam(name = "type", required = false) String matchType){
+		try {
 		printerService.printTeamDetails(matchType);
+		}catch(UnirestException e) {
+			return "You reached your request limit. Wait 18 seconds.";
+		}catch(IOException e) {
+			return "You reached your request limit. Wait 18 seconds.";
+		}
 		return "Check console for team list!!";
 	}
 	
 	@ResponseBody
 	@RequestMapping("/getMatches")
 	public String getMatches(@RequestParam(name = "dateFrom", required = false) String dateFrom,
-			@RequestParam(name = "dateFor", required = false) String dateFor) throws JsonSyntaxException, UnirestException {
+			@RequestParam(name = "dateFor", required = false) String dateFor) throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
 		printerService.printFixtures(dateFrom, dateFor);
 		return "Check console for the nearest matches!"; 
 	}

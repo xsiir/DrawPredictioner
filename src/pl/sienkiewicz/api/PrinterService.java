@@ -20,7 +20,9 @@ public interface PrinterService {
 	 * @param dateFor data do ktorej maja zostac wyswietlone mecze
 	 * @throws JsonSyntaxException gdy format JSONa jest wadliwy
 	 * @throws UnirestException gdy nie uda sie pobrac danych z API
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	void printFixtures(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException;
+	void printFixtures(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException;
 
 }

@@ -36,6 +36,7 @@ public class PrinterServiceImpl implements PrinterService {
 
 	@Override
 	public void printTeamDetails(String matchType) throws JsonSyntaxException, FileNotFoundException, UnirestException, IOException {
+		if(matchType == null) { matchType = "TOTAL"; }
 		apiService.addStandingsToBase();
 		Collections.sort(teamRepository.getDrawStatsList(), getDrawComparator(matchType));
 		for (Team team : teamRepository.getDrawStatsList()) {
@@ -47,12 +48,23 @@ public class PrinterServiceImpl implements PrinterService {
 	}
 
 	@Override
-	public void printFixtures(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException {
+	public void printFixtures(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
 		if(dateFrom == null) { dateFrom = LocalDate.now().toString();}
-		if(dateFor == null) { dateFor = LocalDate.now().toString();}
+		if(dateFor == null) { dateFor = LocalDate.now().plusDays(7).toString();}
 		apiService.addMatchesToRepository(dateFrom, dateFor);
 		for (Matches match : matchesRepository.getMatchesList()) {
-			System.out.println(match.getHomeTeam().getName() + " VS " + match.getAwayTeam().getName());
+			double drawAvgHome = 0;
+			double drawAvgAway = 0;
+			for(Team team : teamRepository.getDrawStatsList()) {
+				if(team.getId() == match.getHomeTeam().getId()) {
+					drawAvgHome = team.getDrawsAVGByMatchType("HOME");
+				}
+				else if(team.getId() == match.getAwayTeam().getId()) {
+					drawAvgAway = team.getDrawsAVGByMatchType("AWAY");
+				}
+			}
+			if(drawAvgAway + drawAvgHome > 100)
+			System.out.println(match.getHomeTeam().getName() + " VS " + match.getAwayTeam().getName() + " " + match.getUtcDate() + " CHANCE: " + (drawAvgAway+drawAvgHome)/2 + "%");
 	}
 }
 

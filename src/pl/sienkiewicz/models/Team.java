@@ -3,13 +3,20 @@ package pl.sienkiewicz.models;
 public class Team {
 
 	private String name;
+	private int id;
 	private TeamFixtures fixtures;
 	
 	
-	public Team(String name) {
+	public Team(int id, String name) {
+		this.id = id;
 		this.name = name;
 		this.fixtures = new TeamFixtures();
 	}
+	
+	public Integer getId() {
+		return id;
+	}
+	
 	public String getName() {
 		return name;
 	}

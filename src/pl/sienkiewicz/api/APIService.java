@@ -34,8 +34,8 @@ public interface APIService {
 	 * @return odpowiedz zapisana w formacie JSON zwrocona jako String
 	 * @throws UnirestException jesli nie uda sie pobrac danych z API
 	 */
-	String callAPIForNextMatches(String dateFrom, String dateFor) throws UnirestException;
+	String callAPIForNextMatches(String code, String dateFrom, String dateFor) throws UnirestException;
 
-	void addMatchesToRepository(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException;
+	void addMatchesToRepository(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException;
 	
 }

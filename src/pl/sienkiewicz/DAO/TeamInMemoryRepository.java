@@ -21,7 +21,7 @@ public class TeamInMemoryRepository {
 
 	public void addTeamFixtureToDataBase(TeamDTO team) {
 		if (!isAlreadyInList(team)) {
-			Team newTeam = new Team(team.getName());
+			Team newTeam = new Team(team.getTeamId(), team.getName());
 			drawStatsList.add(newTeam);
 		}
 		for (Team tempTeam : drawStatsList) {

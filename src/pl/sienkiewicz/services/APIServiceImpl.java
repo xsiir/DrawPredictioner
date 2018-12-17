@@ -4,9 +4,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 
 import org.springframework.stereotype.Service;
@@ -45,32 +48,40 @@ public class APIServiceImpl implements APIService {
 	}
 
 	@Override
-	public String callAPIForNextMatches(String dateFrom, String dateFor) throws UnirestException {
+	public String callAPIForNextMatches(String code, String dateFrom, String dateFor) throws UnirestException {
 		HttpResponse<String> responseBody = Unirest
-				.get("http://api.football-data.org/v2/competitions/PL/matches?status=SCHEDULED&dateFrom="+dateFrom+"&dateTo="+dateFor)
+				.get("http://api.football-data.org/v2/competitions/" + code + "/matches?status=SCHEDULED&dateFrom="+dateFrom+"&dateTo="+dateFor)
 				.header("X-Auth-Token", _KEY).asString();
 
 		return responseBody.getBody();
 	}
 
 	@Override
-	public void addMatchesToRepository(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException {
-		JSONMatchesResult result = new Gson().fromJson(callAPIForNextMatches(dateFrom, dateFor), JSONMatchesResult.class);
-		for (Matches match : result.getMatches()) {
-			matchesRepository.addNewMatchToDataBase(match);
+	public void addMatchesToRepository(String dateFrom, String dateFor) throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
+		matchesRepository.getMatchesList().clear();
+		Enumeration leagueProperties = getLeagueEnumeration();
+		for (; leagueProperties.hasMoreElements();) {
+			JSONMatchesResult result = new Gson().fromJson(callAPIForNextMatches(leagueProperties.nextElement().toString(), dateFrom, dateFor), JSONMatchesResult.class);
+			for (Matches match : result.getMatches()) {
+				matchesRepository.addNewMatchToDataBase(match);
+			}
 		}
 	}
 	
 	@Override
 	public void addStandingsToBase() throws JsonSyntaxException, UnirestException, FileNotFoundException, IOException {
-		Properties p = new Properties();
-		p.load(new FileInputStream("..\\Projekty\\DrawPredictioner\\src\\resources\\leagues.properties"));
-		Enumeration e = p.propertyNames();
-		for (; e.hasMoreElements();) {
-			JSONStandingsResult result = new Gson().fromJson(callAPIForStandings(e.nextElement().toString()),
+		Enumeration leagueProperties = getLeagueEnumeration();
+		for (; leagueProperties.hasMoreElements();) {
+			JSONStandingsResult result = new Gson().fromJson(callAPIForStandings(leagueProperties.nextElement().toString()),
 					JSONStandingsResult.class);
 			addTeam(result);
 		}
+	}
+	
+	private Enumeration<?> getLeagueEnumeration() throws FileNotFoundException, IOException {
+		Properties p = new Properties();
+		p.load(new FileInputStream("..\\Projekty\\DrawPredictioner\\src\\resources\\leagues.properties"));
+		return p.propertyNames();
 	}
 
 	private void addTeam(JSONStandingsResult result) {
